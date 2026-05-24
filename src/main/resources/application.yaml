@@ -1,3 +1,32 @@
 spring:
   application:
     name: event-gateway-service
+
+
+
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: gateway-dashboard-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+  cloud:
+    gateway:
+      routes:
+        - id: websocket_streaming_route
+          uri: ws://localhost:8090
+          predicates:
+            - Path=/ws/events/**
+
+myapp:
+  kafka:
+    topics:
+      game-events: ${KAFKA_TOPIC_GAME:game-events}
+      tournament-events: ${KAFKA_TOPIC_TOURNAMENT:tournament-events}
+      leaderboard-events: ${KAFKA_TOPIC_LEADERBOARD:leaderboard-events}
+
+
+
