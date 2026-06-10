@@ -3,10 +3,13 @@ package com.company.event_gateway_service.service;
 import com.company.event_gateway_service.event.GameEvent;
 import com.company.event_gateway_service.event.GameStatus;
 import org.junit.jupiter.api.Test;
+import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
 import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 
 class NotificationServiceTest {
 
@@ -25,12 +28,18 @@ class NotificationServiceTest {
                 .duration(Duration.ofSeconds(12))
                 .build();
 
-        Object payload = notificationService.broadcastEvent(gameEvent);
-
-        assertThat(payload.toString())
-                .contains("\"gameId\":\"game-1\"")
-                .contains("\"tournamentId\":\"tournament-1\"")
-                .contains("\"status\":\"FINISHED\"")
-                .contains("\"winner\":\"Ana\"");
+        Flux<GameEvent> stream = notificationService.getGameEventStream();
+        StepVerifier.create(stream).
+                then(() -> {
+                    notificationService.broadcastGameEvent(gameEvent);
+                })
+                .assertNext(receivedEvent -> {
+                    assertThat(receivedEvent.gameId()).isEqualTo("game-1");
+                    assertThat(receivedEvent.tournamentId()).isEqualTo("tournament-1");
+                    assertThat(receivedEvent.status()).isEqualTo(GameStatus.FINISHED);
+                    assertThat(receivedEvent.winner()).isEqualTo("Ana");
+                })
+                .thenCancel()
+                .verify();
     }
 }

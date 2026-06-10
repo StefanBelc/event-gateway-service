@@ -1,5 +1,6 @@
 package com.company.event_gateway_service.websocket.handler;
 
+import com.company.event_gateway_service.websocket.WebSocketPublisher;
 import com.company.event_gateway_service.websocket.WebSocketSessionManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.reactive.socket.WebSocketSession;
@@ -16,7 +17,8 @@ class EventsWebSocketHandlerTest {
     void should_register_session_when_connection_is_established() {
         WebSocketSession session = mock(WebSocketSession.class);
         WebSocketSessionManager webSocketSessionManager = new WebSocketSessionManager();
-        EventsWebSocketHandler eventsWebSocketHandler = new EventsWebSocketHandler(webSocketSessionManager);
+        WebSocketPublisher webSocketPublisher = mock(WebSocketPublisher.class);
+        EventsWebSocketHandler eventsWebSocketHandler = new EventsWebSocketHandler(webSocketSessionManager, webSocketPublisher);
 
         eventsWebSocketHandler.onEstablished(session);
 
@@ -27,8 +29,9 @@ class EventsWebSocketHandlerTest {
     void should_close_existing_session_before_registering_new_session() {
         WebSocketSession existingSession = mock(WebSocketSession.class);
         WebSocketSession newSession = mock(WebSocketSession.class);
+        WebSocketPublisher webSocketPublisher = mock(WebSocketPublisher.class);
         WebSocketSessionManager webSocketSessionManager = new WebSocketSessionManager();
-        EventsWebSocketHandler eventsWebSocketHandler = new EventsWebSocketHandler(webSocketSessionManager);
+        EventsWebSocketHandler eventsWebSocketHandler = new EventsWebSocketHandler(webSocketSessionManager, webSocketPublisher);
         when(existingSession.isOpen()).thenReturn(true);
         when(existingSession.close()).thenReturn(Mono.empty());
         webSocketSessionManager.registerSession(existingSession);
@@ -41,15 +44,15 @@ class EventsWebSocketHandlerTest {
 
     @Test
     void should_remove_session_when_connection_is_closed() {
+
         WebSocketSession session = mock(WebSocketSession.class);
         WebSocketSessionManager webSocketSessionManager = new WebSocketSessionManager();
-        EventsWebSocketHandler eventsWebSocketHandler = new EventsWebSocketHandler(webSocketSessionManager);
-        when(session.close()).thenReturn(Mono.empty());
-        webSocketSessionManager.registerSession(session);
+        WebSocketPublisher webSocketPublisher = mock(WebSocketPublisher.class);
+        EventsWebSocketHandler eventsWebSocketHandler = new EventsWebSocketHandler(webSocketSessionManager, webSocketPublisher);
 
+        webSocketSessionManager.registerSession(session);
         eventsWebSocketHandler.onClosed(session);
 
-        verify(session).close();
         assertThat(webSocketSessionManager.getWebSocketSession().get()).isNull();
     }
 }

@@ -48,7 +48,8 @@ class WebSocketSessionManagerTest {
 
         webSocketSessionManager.removeSession(session);
 
-        verify(session).close();
+
         assertThat(webSocketSessionManager.getWebSocketSession().get()).isNull();
+        assertThat(webSocketSessionManager.hasActiveSession()).isFalse();
     }
 }

@@ -3,6 +3,7 @@ package com.company.event_gateway_service.kafka.subscriber;
 import com.company.event_gateway_service.event.GameEvent;
 import com.company.event_gateway_service.event.GameStatus;
 import com.company.event_gateway_service.service.NotificationService;
+import com.company.event_gateway_service.websocket.WebSocketPublisher;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -25,6 +26,6 @@ class GameEventSubscriberTest {
 
         gameEventSubscriber.handleGameEvent(gameEvent);
 
-        verify(notificationService).broadcastEvent(gameEvent);
+        verify(notificationService).broadcastGameEvent(gameEvent);
     }
 }

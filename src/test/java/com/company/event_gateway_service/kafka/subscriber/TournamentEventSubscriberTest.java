@@ -3,6 +3,7 @@ package com.company.event_gateway_service.kafka.subscriber;
 import com.company.event_gateway_service.event.TournamentEvent;
 import com.company.event_gateway_service.event.TournamentStatus;
 import com.company.event_gateway_service.service.NotificationService;
+import com.company.event_gateway_service.websocket.WebSocketPublisher;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -16,6 +17,7 @@ class TournamentEventSubscriberTest {
     @Test
     void should_broadcast_tournament_event() {
         NotificationService notificationService = mock(NotificationService.class);
+
         TournamentEventSubscriber tournamentEventSubscriber = new TournamentEventSubscriber(notificationService);
         TournamentEvent tournamentEvent = TournamentEvent.builder()
                 .tournamentId("tournament-1")
@@ -29,6 +31,6 @@ class TournamentEventSubscriberTest {
 
         tournamentEventSubscriber.handleTournamentEvent(tournamentEvent);
 
-        verify(notificationService).broadcastEvent(tournamentEvent);
+        verify(notificationService).broadcastTournamentEvent(tournamentEvent);
     }
 }
