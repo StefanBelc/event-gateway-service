@@ -1,8 +1,9 @@
 package com.company.event_gateway_service.websocket;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.web.reactive.socket.WebSocketSession;
-import reactor.core.publisher.Mono;
+import org.springframework.web.socket.WebSocketSession;
+
+import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -40,9 +41,8 @@ class WebSocketSessionManagerTest {
     }
 
     @Test
-    void should_close_and_clear_registered_session() {
+    void should_clear_registered_session() {
         WebSocketSession session = mock(WebSocketSession.class);
-        when(session.close()).thenReturn(Mono.empty());
         WebSocketSessionManager webSocketSessionManager = new WebSocketSessionManager();
         webSocketSessionManager.registerSession(session);
 
@@ -51,5 +51,17 @@ class WebSocketSessionManagerTest {
 
         assertThat(webSocketSessionManager.getWebSocketSession().get()).isNull();
         assertThat(webSocketSessionManager.hasActiveSession()).isFalse();
+    }
+
+    @Test
+    void should_close_current_session_when_session_is_open() throws IOException {
+        WebSocketSession session = mock(WebSocketSession.class);
+        when(session.isOpen()).thenReturn(true);
+        WebSocketSessionManager webSocketSessionManager = new WebSocketSessionManager();
+        webSocketSessionManager.registerSession(session);
+
+        webSocketSessionManager.forceCloseCurrentSession();
+
+        verify(session).close();
     }
 }

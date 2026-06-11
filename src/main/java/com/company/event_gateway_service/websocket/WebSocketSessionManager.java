@@ -3,8 +3,9 @@ package com.company.event_gateway_service.websocket;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.socket.WebSocketSession;
+import org.springframework.web.socket.WebSocketSession;
 
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
@@ -31,11 +32,15 @@ public class WebSocketSessionManager {
         return session != null && session.isOpen();
     }
 
-    public void forceCloseCurrentSession() {
+    public void forceCloseCurrentSession()  {
         WebSocketSession currentSession = webSocketSession.get();
         if (currentSession != null && currentSession.isOpen()) {
-            log.info("Close previous session {}", currentSession.getId());
-            currentSession.close().subscribe();
+            log.info("Closing previous session {}", currentSession.getId());
+            try {
+                currentSession.close();
+            } catch (IOException e) {
+                log.warn("Failed to close session {}", currentSession.getId(), e);
+            }
         }
     }
 }

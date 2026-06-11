@@ -1,19 +1,16 @@
 package com.company.event_gateway_service.websocket;
 
-import com.company.event_gateway_service.service.NotificationService;
-import com.company.event_gateway_service.websocket.handler.EventsWebSocketHandler;
 import org.junit.jupiter.api.Test;
-import org.springframework.web.reactive.socket.WebSocketHandler;
-import org.springframework.web.reactive.socket.WebSocketMessage;
-import org.springframework.web.reactive.socket.WebSocketSession;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
+import org.mockito.ArgumentCaptor;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
 import tools.jackson.databind.ObjectMapper;
 
-import java.util.Objects;
+import java.io.IOException;
+import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.argThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -22,35 +19,30 @@ import static org.mockito.Mockito.when;
 class WebSocketPublisherTest {
 
     @Test
-    void should_publish_payload_to_active_session() {
+    void should_publish_payload_to_active_session() throws IOException {
         WebSocketSession session = mock(WebSocketSession.class);
-        WebSocketMessage message = mock(WebSocketMessage.class);
         WebSocketSessionManager webSocketSessionManager = new WebSocketSessionManager();
         ObjectMapper objectMapper = new ObjectMapper();
-        NotificationService notificationService = mock(NotificationService.class);
-        WebSocketPublisher webSocketPublisher = new WebSocketPublisher(notificationService, objectMapper);
-        EventsWebSocketHandler webSocketHandler = new EventsWebSocketHandler(webSocketSessionManager, webSocketPublisher);
+        WebSocketPublisher webSocketPublisher = new WebSocketPublisher(objectMapper, webSocketSessionManager);
         when(session.isOpen()).thenReturn(true);
-        when(session.textMessage("payload")).thenReturn(message);
-        when(session.send(argThat(publisher -> publisher != null))).thenReturn(Mono.empty());
-        when(webSocketPublisher.getPublishingFlux(session))
-                .thenReturn(Flux.just(message));
+        webSocketSessionManager.registerSession(session);
+        ArgumentCaptor<TextMessage> messageCaptor = ArgumentCaptor.forClass(TextMessage.class);
 
+        webSocketPublisher.publish(Map.of("type", "GAME_EVENT"));
 
-        Mono<Void> result = webSocketHandler.handle(session);
-
-        StepVerifier.create(result)
-                .verifyComplete();
-
+        verify(session).sendMessage(messageCaptor.capture());
+        assertThat(messageCaptor.getValue().getPayload()).contains("\"type\":\"GAME_EVENT\"");
     }
 
     @Test
-    void should_not_publish_payload_when_no_session_is_active() {
+    void should_not_publish_payload_when_no_session_is_active() throws IOException {
         WebSocketSession session = mock(WebSocketSession.class);
-        WebSocketPublisher webSocketPublisher = mock(WebSocketPublisher.class);
-        session.textMessage("payload");
-        webSocketPublisher.getPublishingFlux(session);
+        WebSocketSessionManager webSocketSessionManager = new WebSocketSessionManager();
+        ObjectMapper objectMapper = new ObjectMapper();
+        WebSocketPublisher webSocketPublisher = new WebSocketPublisher(objectMapper, webSocketSessionManager);
 
-        verify(session, never()).send(argThat(publisher -> publisher != null));
+        webSocketPublisher.publish(Map.of("type", "GAME_EVENT"));
+
+        verify(session, never()).sendMessage(any(TextMessage.class));
     }
 }
