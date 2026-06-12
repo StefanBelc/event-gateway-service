@@ -50,7 +50,7 @@ class EventsWebSocketHandlerTest {
         EventsWebSocketHandler eventsWebSocketHandler = new EventsWebSocketHandler(webSocketSessionManager);
 
         webSocketSessionManager.registerSession(session);
-        eventsWebSocketHandler.onClosed(session);
+        eventsWebSocketHandler.afterConnectionClosed(session,CloseStatus.NORMAL);
 
         assertThat(webSocketSessionManager.getWebSocketSession().get()).isNull();
     }

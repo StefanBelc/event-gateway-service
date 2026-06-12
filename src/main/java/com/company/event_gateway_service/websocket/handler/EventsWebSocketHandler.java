@@ -28,10 +28,6 @@ public class EventsWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) {
-        onClosed(session);
-    }
-
-    public void onClosed(WebSocketSession session) {
         webSocketSessionManager.removeSession(session);
     }
 }
