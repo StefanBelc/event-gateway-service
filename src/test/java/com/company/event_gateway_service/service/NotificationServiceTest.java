@@ -45,7 +45,7 @@ class NotificationServiceTest {
         NotificationService notificationService = new NotificationService(webSocketPublisher);
         LeaderboardEvent leaderboardEvent = LeaderboardEvent.builder()
                 .tournamentId("tournament-1")
-                .timestamp(Timestamp.from(Instant.parse("2026-06-11T08:00:00Z")))
+                .timestamp(Instant.parse("2026-06-11T08:00:00Z"))
                 .playersCount(3)
                 .averageScore(10.5)
                 .topPlayers(List.of())

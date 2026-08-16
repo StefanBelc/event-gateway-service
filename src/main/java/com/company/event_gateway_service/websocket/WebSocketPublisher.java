@@ -28,6 +28,7 @@ public class WebSocketPublisher {
                 activeSession.sendMessage(
                         new TextMessage(formattedEvent)
                 );
+                log.info("Event published successfully !");
             } catch (IOException e) {
                 log.error("Could not publish event {}" , e.getMessage());
             }

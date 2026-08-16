@@ -24,10 +24,12 @@ public class EventsWebSocketHandler extends TextWebSocketHandler {
             webSocketSessionManager.forceCloseCurrentSession();
         }
         webSocketSessionManager.registerSession(session);
+        log.info("Connected to web socket session {}", session.getId());
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) {
         webSocketSessionManager.removeSession(session);
+        log.warn("Disconnected from web socket session {}", session.getId());
     }
 }

@@ -21,7 +21,7 @@ class LeaderboardEventSubscriberTest {
         LeaderboardEventSubscriber leaderboardEventSubscriber = new LeaderboardEventSubscriber(notificationService);
         LeaderboardEvent leaderboardEvent = LeaderboardEvent.builder()
                 .tournamentId("tournament-1")
-                .timestamp(Timestamp.from(Instant.parse("2026-06-10T10:15:30Z")))
+                .timestamp(Instant.parse("2026-06-10T10:15:30Z"))
                 .playersCount(3)
                 .averageScore(12.5)
                 .topPlayers(List.of())

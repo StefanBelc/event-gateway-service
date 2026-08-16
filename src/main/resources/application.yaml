@@ -17,9 +17,24 @@ spring:
 
     consumer:
       group-id: gateway-service
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: latest
+      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.trusted.packages: "com.company.*"
+
+        spring.json.use.type.mapper.for.collections: false
+
+        spring.json.type.mapping: >-
+          leaderboard_event:com.company.event_gateway_service.event.LeaderboardEvent,
+          com.company.promo.service.leaderboard.LeaderboardEvent:com.company.event_gateway_service.event.LeaderboardEvent,
+          game_event:com.company.event_gateway_service.event.GameEvent,
+          com.company.promobridge.GameEvent:com.company.event_gateway_service.event.GameEvent,
+          tournament_event:com.company.event_gateway_service.event.TournamentEvent,
+          com.company.promobridge.TournamentEvent:com.company.event_gateway_service.event.TournamentEvent
+      spring.kafka.jackson.serialization.inclusion: non_null
 
   cloud:
     gateway:
