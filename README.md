@@ -6,7 +6,7 @@ Built using a fully reactive, non-blocking paradigm, this service acts as an eve
 
  Architectural Blueprint
 [Tournament Services] -> (Kafka Topic) -> [Event Gateway Service] -> (WebSockets) -> [Dashboard UI]
-                                             └─ Reactor Kafka      └─ Spring WebFlux
+                                                 
 
                                              
 Edge Routing Layer: Built on Spring Cloud Gateway running on an embedded, asynchronous Netty server (fully bypassing blocking Tomcat threads).
