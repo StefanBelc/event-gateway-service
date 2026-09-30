@@ -2,7 +2,6 @@ package com.company.event_gateway_service.event;
 
 import lombok.Builder;
 
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 

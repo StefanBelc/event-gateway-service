@@ -1,14 +1,10 @@
 services:
 
   event-gateway-service:
-    image: eclipse-temurin:20-jre-alpine
+    build: .
     container_name: gateway-service
     ports:
       - "8084:8090"
-    volumes:
-      - ./target:/app
-    working_dir: /app
-    command: java -jar event-gateway-service-0.0.1-SNAPSHOT.jar
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - MYAPP_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
@@ -17,6 +13,6 @@ services:
 
 networks:
   promo-network:
-    name: promo-infrastructure_default
+    name: promo-shared-network
     external: true
 

@@ -12,7 +12,7 @@ spring:
 
 
   kafka:
-    bootstrap-servers: kafka:9096
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
 
 
     consumer:
@@ -34,13 +34,17 @@ spring:
           com.company.promobridge.GameEvent:com.company.event_gateway_service.event.GameEvent,
           tournament_event:com.company.event_gateway_service.event.TournamentEvent,
           com.company.promobridge.TournamentEvent:com.company.event_gateway_service.event.TournamentEvent
-      spring.kafka.jackson.serialization.inclusion: non_null
+         
+
+    jackson:
+      serialization:
+        inclusion: non_null
 
   cloud:
     gateway:
       routes:
         - id: websocket_streaming_route
-          uri: ws://localhost:8090
+          uri: ws://event-gateway-service:8090
           predicates:
             - Path=/ws/events/**
       globalcors:
